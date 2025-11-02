@@ -1,5 +1,6 @@
 import os
 from math import log
+import json 
 
 tokens = []
 filenames = []
@@ -31,11 +32,5 @@ for term in terms:                                                              
     inverted_index[term] = termInDocuments                                                  # Olo auto einai ena dictionary me kleidi thn leksh 
 
 
-with open("dict.txt", "w") as file:
-    for term , document in inverted_index.items():
-            file.write("\n"+ term)
-            file.write(f"\t{document[-1]}" )
-            for doc in document[:-1]:
-                file.write("\t("+ doc[0] + f",{doc[1]:.3f})")
-
+with open("inverted_index.json", "w") as f: json.dump(inverted_index, f, indent=4)
 

@@ -1,24 +1,22 @@
+import json
+
 tfidf_vectors = {}   # filename -> {term: tfidf} , {term2:tfidf}
 
+with open("inverted_index.json", "r") as f:
+    data = json.load(f)
 
-with open("dict.txt", "r") as file:  
-    for line in file:
-        parts = line.strip().split("\t")
-        if len(parts) < 2:                              # skip 1h grammh (kai oses einai kenes H ligotera apo 2 stoixeia)
-            continue
+for key in data.keys():
+        idfValue = data[key].pop()
 
-        term = parts[0].strip()                         # pairnoume term
-        idf = float(parts[1].strip())                   # pairnoume to idf  
-                                                        
-        for pair in parts[2:]:                          # gia kathe lista meta to idf bgale tis ()    
-            pair = pair.strip().strip("() ")            
-            filename, tf = pair.split(",")              # xwrise to onoma tou document me to term frequency
-            tf = float(tf)                              # float (tf) 
-            tfidf = tf * idf                            # bres EPITELOUS to tfidf
+        for item in data[key]:
+            filename = item[0]
+            tfValue = item[1]                           
+            tfidf = tfValue * idfValue                    
 
             if filename not in tfidf_vectors:           # an den yparxei dict gia auto to arxeio dhmiourghse to 
                 tfidf_vectors[filename] = {}
-            tfidf_vectors[filename][term] = tfidf       # nested dictionary: filename -> word -> tfidf value 
+            tfidf_vectors[filename][key] = tfidf       # nested dictionary: filename -> word -> tfidf value 
                                                         
 
+with open("tfidf_vectors.json", "w") as f: json.dump(tfidf_vectors, f, indent=4)
 
