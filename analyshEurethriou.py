@@ -18,5 +18,5 @@ for key in data.keys():
             tfidf_vectors[filename][key] = tfidf       # nested dictionary: filename -> word -> tfidf value 
                                                         
 
-with open("tfidf_vectors.json", "w") as f: json.dump(tfidf_vectors, f, indent=4)
+with open("tfidfVectors.json", "w") as f: json.dump(tfidf_vectors, f, indent=4)
 

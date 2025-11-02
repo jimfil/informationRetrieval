@@ -1,6 +1,10 @@
-from analyshErwthsewn import queryVector
-from analyshEurethriou import tfidf_vectors
+import json
 from math import sqrt  #gia ypologismo Cosine Simularity
+
+with open("queryVector.json", "r") as f:
+    queryVector = json.load(f)
+with open("tfidfVectors.json", "r") as f:
+    tfidf_vectors = json.load(f)
 
 def cosine_similarity(wQuaries, wDocuments):
     
@@ -13,9 +17,10 @@ def cosine_similarity(wQuaries, wDocuments):
 
     return (numerator / denominator) if denominator != 0 else 0
 
-answer = {}
 def findDoc(query):
+    answer = {}
     for filename in tfidf_vectors.keys():
-        answer[filename] = cosine_similarity(queryVector[query],tfidf_vectors[filename])
+        answer[filename] = cosine_similarity(queryVector[str(query)],tfidf_vectors[filename])
     sortd = sorted(answer.items(), key=lambda x: x[1], reverse=True)                # ta apotelesmata einai konta metaksi tous 0.59 to prwto me 0.57 to deutero (fysiologiko nmzs)
     return sortd                                                                     
+

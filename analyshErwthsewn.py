@@ -1,17 +1,15 @@
+import json 
+
 queryVector = {}
 idfWords = {}
 
-with open("dict.txt", "r") as file:  
-    for line in file:
-        parts = line.strip().split("\t")
-        if len(parts) < 2:                              # skip 1h grammh (kai oses einai kenes H ligotera apo 2 stoixeia)
-            continue
+with open("inverted_index.json", "r") as f:
+    data = json.load(f)
 
-        term = parts[0].strip()                         # pairnoume term
-        idf = float(parts[1].strip())                   # pairnoume to idf  
-        idfWords[term] = idf                            # dhmiourgoume to leksiko mas
+for key in data.keys():
+        idfWords[key] = data[key].pop()
 
-
+        
 with open("Queries.txt", "r") as file: 
     i = 1
     for line in file:
@@ -26,10 +24,10 @@ with open("Queries.txt", "r") as file:
             tfidfValue = tf_query[term] * idftemp       # ypologismos tfidfvalues
             if i not in queryVector:                    # an den yparxei dict gia auto to arxeio dhmiourghse to 
                 queryVector[i] = {}
-            queryVector[i][term] = tfidfValue           # 1o leksiko 1h erwthsh, 2o leksiko 2h erwthsh klp
+            queryVector[i][term] = tfidfValue           # nested dictionary: query Number -> word -> tfidf value
         i += 1
                                                 
-
+with open("queryVector.json", "w") as f: json.dump(queryVector, f, indent=4)
 
 
 
