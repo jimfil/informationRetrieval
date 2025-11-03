@@ -30,7 +30,7 @@ for i in range(1,21):
         sortedDocum[i] = []
     lista = findDoc(i)
     for item in lista:    
-        sortedDocum[i].append(item[0])
+        sortedDocum[i].append(item)
 
 
 with open("sortedRelevant.json", "w") as f: json.dump(sortedDocum, f, indent=4)
