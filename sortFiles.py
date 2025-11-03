@@ -24,3 +24,13 @@ def findDoc(query):
     sortd = sorted(answer.items(), key=lambda x: x[1], reverse=True)                # ta apotelesmata einai konta metaksi tous 0.59 to prwto me 0.57 to deutero (fysiologiko nmzs)
     return sortd                                                                     
 
+sortedDocum = {}
+for i in range(1,21):
+    if i not in tfidf_vectors:
+        sortedDocum[i] = []
+    lista = findDoc(i)
+    for item in lista:    
+        sortedDocum[i].append(item[0])
+
+
+with open("sortedRelevant.json", "w") as f: json.dump(sortedDocum, f, indent=4)
