@@ -7,7 +7,6 @@ with open("inverted_index.json", "r") as f:
 logValu = {}
 for key in data.keys():
     logValu[key] = data[key].pop()
-    print(logValu[key])
 
 tf_query ={}
 with open("Queries.txt", "r") as file: 

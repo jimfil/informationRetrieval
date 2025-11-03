@@ -13,8 +13,7 @@ def cosine_similarity(wQuaries, wDocuments):
 
     wq = sum(v * v for v in wQuaries.values())                                      # Ypologismos paronwmasth ||A||*||D||
     wd = sum(v * v for v in wDocuments.values())                                    # Riza(Σ wq^2 * Σ wd^2)
-    denominator = sqrt(wq * wd)                                               
-    print(numerator/denominator)
+    denominator = sqrt(wq * wd)  
     return (numerator / denominator) if denominator != 0 else 0
 
 def findDoc(query):
@@ -30,7 +29,7 @@ for i in range(1,21):
         sortedDocum[i] = []
     lista = findDoc(i)
     for item in lista:    
-        sortedDocum[i].append(item[0])
+        sortedDocum[i].append(item)
 
 
 with open("sortedRelevant.json", "w") as f: json.dump(sortedDocum, f, indent=4)
