@@ -6,26 +6,30 @@ termWeight_vectors = {}   # filename -> {term: tfidf} , {term2:tfidf}
 with open("inverted_index.json", "r") as f:
     data = json.load(f)
 logValu = {}
-denom = {}
-for key in data.keys():
-    tfValue = 0
+fileDict = {}
+
+for key in data.keys():                                     # gia kathe leksi
     logValu[key] = data[key].pop()
-    for item in data[key]:
-        mult = (item[1]* logValu[key])
-        tfValue += (mult * mult)  
+    for item in data[key]:                                  # pare kathe arxeio pou yparxei h leksh auth
+        mult = (item[1]* logValu[key])                      # ypologise to tf * log
+        if item[0] not in fileDict:                         # an den yparxei dict gia auto to arxeio dhmiourghse to 
+            fileDict[item[0]] = {} 
+        fileDict[item[0]][key] = mult
 
-    denom[key] = sqrt(tfValue)
+                                                            # pleon exoume kathe arxeio me oti TERM exei
 
-for key in data.keys():
-             
-    for item in data[key]:
-        filename = item[0]
-        tfValue = item[1]               
-        num = tfValue * logValu[key] 
-        tw = num / denom[key]  
+for filename in fileDict.keys():                                 # gia kathe arxeio
+    temp = 0  
+    for term2 in fileDict[filename].keys():
+        temp += (fileDict[filename][term2])* (fileDict[filename][term2])
+    denom = sqrt(temp)
+    for term in fileDict[filename].keys():                       # gia kathe leksi
+        num = fileDict[filename][term] 
+        docWeight = num / denom          
+        
         if filename not in termWeight_vectors:           # an den yparxei dict gia auto to arxeio dhmiourghse to 
             termWeight_vectors[filename] = {}
-        termWeight_vectors[filename][key] = tw       # nested dictionary: filename -> word -> tfidf value 
+        termWeight_vectors[filename][term] = docWeight       # nested dictionary: filename -> word -> tfidf value 
                                                         
 
 with open("termWeight_vectors.json", "w") as f: json.dump(termWeight_vectors, f, indent=4)
