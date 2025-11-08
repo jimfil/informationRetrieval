@@ -11,7 +11,7 @@ def cosine_similarity(wQuaries, wDocuments):
     common_terms = set(wQuaries.keys()) & set(wDocuments.keys())                    # lambanoume koina kleidia apo DOCUMENT kai QUERIES
     numerator = sum(wQuaries[t] * wDocuments[t] for t in common_terms)              # Arithmiths
 
-    wq = sum(v * v for v in wQuaries.values())   #allagh se kati me common terms                                   # Ypologismos paronwmasth ||A||*||D||
+    wq = sum(v * v for v in wQuaries.values())                                      # Ypologismos paronwmasth ||A||*||D||
     wd = sum(v * v for v in wDocuments.values())                                    # Riza(Σ wq^2 * Σ wd^2)
     denominator = sqrt(wq * wd)  
     return (numerator / denominator) if denominator != 0 else 0
@@ -25,7 +25,7 @@ def findDoc(query):
 
 sortedDocum = {}
 for i in range(1,21):
-    if i not in tfidf_vectors:
+    if i not in sortedDocum:
         sortedDocum[i] = []
     lista = findDoc(i)
     for item in lista:    

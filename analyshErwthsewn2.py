@@ -20,8 +20,8 @@ with open("Queries.txt", "r") as file:
             tf_query[i][term] /= len(words)
         i += 1
 
-for i, terms in tf_query.items():
-    max_tf = max(terms.values())
+for i in tf_query.keys():
+    max_tf = max(tf_query[i].values())
     for term in tf_query[i].keys(): 
         qw = (0.5 + 0.5 * tf_query[i][term] / max_tf) * logValu[key]
         if i not in queryVector: queryVector[i] = {}
