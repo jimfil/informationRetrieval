@@ -6,9 +6,9 @@ with open("inverted_index.json", "r") as f:
     data = json.load(f)
 
 for key in data.keys():
-        idfValue = data[key].pop()
+        idfValue = data[key][-1]
 
-        for item in data[key]:
+        for item in data[key][:-1]:
             filename = item[0]
             tfValue = item[1]                           
             tfidf = tfValue * idfValue                    

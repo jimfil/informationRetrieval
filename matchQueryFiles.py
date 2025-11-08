@@ -26,7 +26,7 @@ def findDoc(query):
 
 sortedDocum = {}
 for i in range(1,21):
-    if i not in tfidf_vectors:
+    if i not in sortedDocum:
         sortedDocum[i] = []
     lista = findDoc(i)
     for item in lista:    

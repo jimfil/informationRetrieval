@@ -26,7 +26,7 @@ for term in terms:                                                              
         if term in doc:                                                                     # Des ean yparxei h leksh sthn lista
             tfTermInDoc = (doc.count(term)/len(doc))                                        # An nai bres to term Frequency 
             termInDocuments.append([filenames[i], tfTermInDoc])                             # Kai ftiaxe ena list (me to onoma tou arxeiou kai to tf) mesa se ena deutero list px [[00001 , 2] , [00002 , 1]] 
-    if len(termInDocuments): idfTerm = log(len(doc)/len(termInDocuments) , 10)              # Ypologise to idf (log(Documents in total / Documents me thn leksi))
+    idfTerm = log(len(tokens)/len(termInDocuments) , 10)                                    # Ypologise to idf (log(Documents in total / Documents me thn leksi))
     termInDocuments.append(idfTerm)                                                         # Balto sto telos tou deuterou list  px [[00001 , 2] , [00002 , 1] , 0.173]
 
     inverted_index[term] = termInDocuments                                                  # Olo auto einai ena dictionary me kleidi thn leksh 

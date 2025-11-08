@@ -7,7 +7,7 @@ with open("inverted_index.json", "r") as f:
     data = json.load(f)
 
 for key in data.keys():
-        idfWords[key] = data[key].pop()
+    idfWords[key] = data[key][-1]
 
         
 with open("Queries.txt", "r") as file: 
@@ -17,7 +17,7 @@ with open("Queries.txt", "r") as file:
         tf_query = {}
         for term in words:
             tf_query[term] = tf_query.get(term, 0) + 1
-        for term in tf_query:
+        for term in tf_query.keys():
             tf_query[term] /= len(words)
             if term in idfWords: idftemp =idfWords[term]# an DEN yparxei auth h leksh sto leksiko mas den tha thn psaksoume ara idfvalue=0 
             else:  idftemp = 0 
