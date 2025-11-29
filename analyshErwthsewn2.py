@@ -28,7 +28,7 @@ for i in tf_query.keys():
         queryVector[i][term]= qw
 
 
-with open("queryVector.json", "w") as f: json.dump(queryVector, f, indent=4)
+with open("queryVector2.json", "w") as f: json.dump(queryVector, f, indent=4)
   
 
 

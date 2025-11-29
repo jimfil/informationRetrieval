@@ -1,6 +1,6 @@
 import json
 
-with open("sortedRelevant.json", "r") as f:
+with open("sortedRelevant2.json", "r") as f:
     sortedRelevant = json.load(f)
 
 name = 0 
