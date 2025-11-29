@@ -3,7 +3,7 @@ from math import sqrt  #gia ypologismo Cosine Simularity
 
 with open("queryVector.json", "r") as f:
     queryVector = json.load(f)
-with open("tfidfVectors.json", "r") as f:
+with open("termWeight_vectors.json", "r") as f:
     tfidf_vectors = json.load(f)
 
 def cosine_similarity(wQuaries, wDocuments):
@@ -13,8 +13,7 @@ def cosine_similarity(wQuaries, wDocuments):
 
     wq = sum(v * v for v in wQuaries.values())                                      # Ypologismos paronwmasth ||A||*||D||
     wd = sum(v * v for v in wDocuments.values())                                    # Riza(Σ wq^2 * Σ wd^2)
-    denominator = sqrt(wq * wd)                                               
-
+    denominator = sqrt(wq * wd)  
     return (numerator / denominator) if denominator != 0 else 0
 
 def findDoc(query):

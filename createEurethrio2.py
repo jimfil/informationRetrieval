@@ -15,6 +15,7 @@ for filename in os.listdir(folder):
 
     tokens.append(docum.split())
    
+print(tokens)
 
 terms = list(set(word for doc in tokens for word in doc))
 
