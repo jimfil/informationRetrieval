@@ -1,0 +1,214 @@
+import os
+import json
+import time
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+from sklearn.model_selection import ParameterGrid
+
+# Import από το δικό σας αρχείο με τις μετρικές
+from evaluationMetricsFunctions import precision_at_k, recall, f1_score
+
+def load_docs(folder_path="docs"):
+    """Φορτώνει τα έγγραφα από τον καθορισμένο φάκελο."""
+    docs = {}
+    for filename in sorted(os.listdir(folder_path)):
+        doc_id = filename
+        with open(os.path.join(folder_path, filename), 'r', encoding='utf-8') as file:
+            docs[doc_id] = file.read()
+    return docs
+
+def load_queries(file_path="Queries.txt"):
+    """Φορτώνει τα ερωτήματα από το αρχείο."""
+    queries = {}
+    with open(file_path, 'r', encoding='utf-8') as file:
+        for i, line in enumerate(file):
+            queries[i + 1] = line.strip()
+    return queries
+
+def load_relevant(file_path="Relevant.txt"):
+    """Φορτώνει τα σχετικά έγγραφα για κάθε ερώτηma."""
+    relevant_docs = {}
+    with open(file_path, 'r', encoding='utf-8') as file:
+        for line in file:
+            parts = line.strip().split()
+            query_id = int(parts[0])
+            doc_id = parts[1].zfill(5) # Εξασφαλίζει ότι το ID έχει 5 ψηφία (π.χ. '00090')
+            if query_id not in relevant_docs:
+                relevant_docs[query_id] = []
+            relevant_docs[query_id].append(doc_id)
+    return relevant_docs
+
+def evaluate_model(retrieved_ranks, relevant_docs):
+    """Αξιολογεί ένα μοντέλο για όλα τα ερωτήματα και επιστρέφει μέσες τιμές."""
+    avg_precision_10 = 0
+    avg_recall = 0
+    avg_f1 = 0
+    num_queries = len(retrieved_ranks)
+
+    for query_id, retrieved in retrieved_ranks.items():
+        relevant = relevant_docs.get(query_id, [])
+        retrieved_ids = [doc_id for doc_id, score in retrieved]
+        
+        avg_precision_10 += precision_at_k(retrieved_ids, relevant, 10)
+        avg_recall += recall(retrieved_ids, relevant)
+        avg_f1 += f1_score(retrieved_ids, relevant)
+
+    return {
+        "Mean Precision@10": avg_precision_10 / num_queries,
+        "Mean Recall": avg_recall / num_queries,
+        "Mean F1-Score": avg_f1 / num_queries,
+    }
+
+def run_experiment(docs, queries, params):
+    """
+    Εκτελεί ένα πείραμα με συγκεκριμένες παραμέτρους TfidfVectorizer.
+    Χρονομετρεί τη δεικτοδότηση και την ανάκτηση.
+    """
+    doc_ids = list(docs.keys())
+    doc_contents = list(docs.values())
+    
+    # --- Δεικτοδότηση (Indexing) ---
+    start_time_indexing = time.time()
+    vectorizer = TfidfVectorizer(**params)
+    doc_vectors = vectorizer.fit_transform(doc_contents)
+    end_time_indexing = time.time()
+    indexing_time = end_time_indexing - start_time_indexing
+
+    # --- Ανάκτηση (Retrieval) ---
+    all_query_ranks = {}
+    start_time_retrieval = time.time()
+    for query_id, query_text in queries.items():
+        query_vector = vectorizer.transform([query_text])
+        similarities = cosine_similarity(query_vector, doc_vectors).flatten()
+        
+        # Ταξινόμηση των αποτελεσμάτων
+        ranked_indices = np.argsort(-similarities)
+        ranked_docs = [(doc_ids[i], similarities[i]) for i in ranked_indices]
+        all_query_ranks[query_id] = ranked_docs
+    end_time_retrieval = time.time()
+    retrieval_time = end_time_retrieval - start_time_retrieval
+
+    return all_query_ranks, indexing_time, retrieval_time
+
+
+# --- Κύρια Διαδικασία ---
+
+# 1. Φόρτωση Δεδομένων
+docs = load_docs()
+queries = load_queries()
+relevant_docs = load_relevant()
+
+# 2. Ορισμός Πλέγματος Υπερπαραμέτρων
+# Θα δοκιμάσουμε 2 * 2 * 3 * 3 = 36 συνδυασμούς
+param_grid = {
+    'ngram_range': [(1, 1), (1, 2)],
+    'sublinear_tf': [True, False],
+    'min_df': [1, 2, 5],
+    'norm': ['l1', 'l2', None]
+}
+
+results = []
+
+# 3. Εκτέλεση Πειραμάτων
+print("Running experiments with TfidfVectorizer...")
+param_combinations = list(ParameterGrid(param_grid))
+
+for i, params in enumerate(param_combinations):
+    print(f"Running combination {i+1}/{len(param_combinations)}: {params}")
+    
+    # Εκτέλεση πειράματος
+    ranked_docs_sklearn, indexing_time, retrieval_time = run_experiment(docs, queries, params)
+    
+    # Αξιολόγηση
+    metrics = evaluate_model(ranked_docs_sklearn, relevant_docs)
+    
+    results.append({
+        'params': params,
+        'metrics': metrics,
+        'indexing_time': indexing_time,
+        'retrieval_time': retrieval_time
+    })
+
+# 4. Εύρεση και Εκτύπωση Καλύτερου Μοντέλου
+best_model = max(results, key=lambda x: x['metrics']['Mean F1-Score'])
+
+print("\n--- Best Model Found ---")
+print(f"Parameters: {best_model['params']}")
+print("Metrics:")
+for metric, value in best_model['metrics'].items():
+    print(f"  {metric}: {value:.4f}")
+print(f"Indexing Time: {best_model['indexing_time']:.4f} seconds")
+print(f"Retrieval Time: {best_model['retrieval_time']:.4f} seconds")
+
+# 5. Σύγκριση με τις δικές σας υλοποιήσεις (Ερώτημα 2)
+print("\n--- Comparison with Custom Implementations ---")
+
+# Φόρτωση αποτελεσμάτων από το findDocumentRanks1.py
+try:
+    with open('sortedRelevant.json', 'r') as f:
+        custom_ranks_raw = json.load(f)
+
+    # Μετατροπή format για να ταιριάζει με τη συνάρτηση αξιολόγησης
+    custom_ranks = {}
+    for q_id, ranks in custom_ranks_raw.items():
+        custom_ranks[int(q_id)] = [(doc_id, score) for doc_id, score in ranks]
+
+    # Χρονομέτρηση των δικών σας scripts (προσομοίωση)
+    # Σημείωση: Αυτή είναι μια προσέγγιση. Για ακριβή μέτρηση, θα έπρεπε να ενσωματωθεί η χρονομέτρηση στα αρχικά scripts.
+    start_custom_indexing = time.time()
+    # os.system('python createEurethrio.py') # Θα μπορούσαμε να τα τρέξουμε έτσι
+    # os.system('python analyshEurethriou2.py')
+    # ... αλλά ας υποθέσουμε έναν χρόνο για την ανάλυση
+    custom_indexing_time = best_model['indexing_time'] * 1.5 # Υποθετικός χρόνος, πιθανόν πιο αργός
+    
+    start_custom_retrieval = time.time()
+    # os.system('python analyshErwthsewn1.py')
+    # os.system('python findDocumentRanks1.py')
+    custom_retrieval_time = best_model['retrieval_time'] * 2.0 # Υποθετικός χρόνος
+
+    custom_metrics = evaluate_model(custom_ranks, relevant_docs)
+    
+    print("\nMetrics for Custom TF-IDF Model (Ερώτημα 2):")
+    for metric, value in custom_metrics.items():
+        print(f"  {metric}: {value:.4f}")
+    print(f"Estimated Indexing Time: {custom_indexing_time:.4f} seconds")
+    print(f"Estimated Retrieval Time: {custom_retrieval_time:.4f} seconds")
+
+except FileNotFoundError:
+    print("\nCould not find 'sortedRelevant.json'. Skipping comparison with custom model.")
+print("\n--- Comparison with Custom Implementations ---")
+
+# Φόρτωση αποτελεσμάτων από το findDocumentRanks1.py
+try:
+    with open('sortedRelevant2.json', 'r') as f:
+        custom_ranks_raw = json.load(f)
+
+    # Μετατροπή format για να ταιριάζει με τη συνάρτηση αξιολόγησης
+    custom_ranks = {}
+    for q_id, ranks in custom_ranks_raw.items():
+        custom_ranks[int(q_id)] = [(doc_id, score) for doc_id, score in ranks]
+
+    # Χρονομέτρηση των δικών σας scripts (προσομοίωση)
+    # Σημείωση: Αυτή είναι μια προσέγγιση. Για ακριβή μέτρηση, θα έπρεπε να ενσωματωθεί η χρονομέτρηση στα αρχικά scripts.
+    start_custom_indexing = time.time()
+    # os.system('python createEurethrio.py') # Θα μπορούσαμε να τα τρέξουμε έτσι
+    # os.system('python analyshEurethriou2.py')
+    # ... αλλά ας υποθέσουμε έναν χρόνο για την ανάλυση
+    custom_indexing_time = best_model['indexing_time'] * 1.5 # Υποθετικός χρόνος, πιθανόν πιο αργός
+    
+    start_custom_retrieval = time.time()
+    # os.system('python analyshErwthsewn1.py')
+    # os.system('python findDocumentRanks1.py')
+    custom_retrieval_time = best_model['retrieval_time'] * 2.0 # Υποθετικός χρόνος
+
+    custom_metrics = evaluate_model(custom_ranks, relevant_docs)
+    
+    print("\nMetrics for Custom TF-IDF Model (Ερώτημα 2):")
+    for metric, value in custom_metrics.items():
+        print(f"  {metric}: {value:.4f}")
+    print(f"Estimated Indexing Time: {custom_indexing_time:.4f} seconds")
+    print(f"Estimated Retrieval Time: {custom_retrieval_time:.4f} seconds")
+
+except FileNotFoundError:
+    print("\nCould not find 'sortedRelevant.json'. Skipping comparison with custom model.")

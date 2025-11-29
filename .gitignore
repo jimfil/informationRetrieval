@@ -1,3 +1,5 @@
 # Ignore all JSON files
 *.json
 *.pdf
+# Ignore Python cache files
+__pycache__/
