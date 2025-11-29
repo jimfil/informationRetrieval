@@ -10,7 +10,7 @@ from sklearn.model_selection import ParameterGrid
 from evaluationMetricsFunctions import precision_at_k, recall, f1_score
 
 def load_docs(folder_path="docs"):
-    """Φορτώνει τα έγγραφα από τον καθορισμένο φάκελο."""
+    #Φορτώνει τα έγγραφα από τον καθορισμένο φάκελο.
     docs = {}
     for filename in sorted(os.listdir(folder_path)):
         doc_id = filename
@@ -19,7 +19,7 @@ def load_docs(folder_path="docs"):
     return docs
 
 def load_queries(file_path="Queries.txt"):
-    """Φορτώνει τα ερωτήματα από το αρχείο."""
+    #Φορτώνει τα ερωτήματα από το αρχείο.
     queries = {}
     with open(file_path, 'r', encoding='utf-8') as file:
         for i, line in enumerate(file):
@@ -68,18 +68,18 @@ def run_experiment(docs, queries, params):
     doc_ids = list(docs.keys())
     doc_contents = list(docs.values())
     
-    # --- Δεικτοδότηση (Indexing) ---
+    # Briskoume weight apo document
     start_time_indexing = time.time()
-    vectorizer = TfidfVectorizer(**params)
-    doc_vectors = vectorizer.fit_transform(doc_contents)
+    vectorizer = TfidfVectorizer(**params)   # gia na mhn grafoume kathe fora TfidfVectorizer(**params)
+    doc_vectors = vectorizer.fit_transform(doc_contents) #pairnoume tf kai idf apo docs
     end_time_indexing = time.time()
     indexing_time = end_time_indexing - start_time_indexing
 
     # --- Ανάκτηση (Retrieval) ---
     all_query_ranks = {}
     start_time_retrieval = time.time()
-    for query_id, query_text in queries.items():
-        query_vector = vectorizer.transform([query_text])
+    for query_id, query_text in queries.items(): # query_text -> string oxi lista !!!
+        query_vector = vectorizer.transform([query_text]) 
         similarities = cosine_similarity(query_vector, doc_vectors).flatten()
         
         # Ταξινόμηση των αποτελεσμάτων
@@ -119,7 +119,6 @@ for i, params in enumerate(param_combinations):
     
     # Εκτέλεση πειράματος
     ranked_docs_sklearn, indexing_time, retrieval_time = run_experiment(docs, queries, params)
-    
     # Αξιολόγηση
     metrics = evaluate_model(ranked_docs_sklearn, relevant_docs)
     
