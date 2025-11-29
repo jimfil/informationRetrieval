@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-def precision(retrieved_docs, relevant_docs):
+def precision(retrieved_docs, relevant_docs):  # false positives (eggrafa pou anakththikan kai einai lathos)
     """
     Υπολογίζει την Ακρίβεια (Precision).
     Precision = (Αριθμός σχετικών εγγράφων που ανακτήθηκαν) / (Συνολικός αριθμός εγγράφων που ανακτήθηκαν)
@@ -19,7 +19,7 @@ def precision(retrieved_docs, relevant_docs):
         
     return true_positives / len(retrieved_docs)
 
-def recall(retrieved_docs, relevant_docs):
+def recall(retrieved_docs, relevant_docs): # false negatives (eggrafa pou DEN anakththikan kai einai SWSTA)
     """
     Υπολογίζει την Ανάκληση (Recall).
     Recall = (Αριθμός σχετικών εγγράφων που ανακτήθηκαν) / (Συνολικός αριθμός σχετικών εγγράφων)
@@ -39,14 +39,6 @@ def recall(retrieved_docs, relevant_docs):
     return true_positives / len(relevant_docs)
 
 def f1_score(retrieved_docs, relevant_docs):
-    """
-    Υπολογίζει το F1-Score.
-    F1 = 2 * (Precision * Recall) / (Precision + Recall)
-
-    :param retrieved_docs: Λίστα με τα IDs των ανακτημένων εγγράφων.
-    :param relevant_docs: Λίστα με τα IDs των σχετικών εγγράφων.
-    :return: Η τιμή του F1-score (float).
-    """
     p = precision(retrieved_docs, relevant_docs)
     r = recall(retrieved_docs, relevant_docs)
     
