@@ -23,12 +23,10 @@ with open("Queries.txt", "r") as file:
 for i in tf_query.keys():
     max_tf = max(tf_query[i].values())
     for term in tf_query[i].keys(): 
-        qw = (0.5 + 0.5 * tf_query[i][term] / max_tf) * logValu[key]
+        qw = (0.5 + 0.5 * tf_query[i][term] / max_tf) * logValu.get(term, 0.0)
         if i not in queryVector: queryVector[i] = {}
         queryVector[i][term]= qw
 
 
 with open("queryVector2.json", "w") as f: json.dump(queryVector, f, indent=4)
   
-
-
