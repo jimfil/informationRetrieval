@@ -3,7 +3,7 @@ from math import sqrt  #gia ypologismo Cosine Simularity
 
 with open("queryVector2.json", "r") as f:
     queryVector = json.load(f)
-with open("termWeight_vectors2.json", "r") as f:
+with open("tfidfVectors2.json", "r") as f:
     tfidf_vectors = json.load(f)
 
 def cosine_similarity(wQuaries, wDocuments):

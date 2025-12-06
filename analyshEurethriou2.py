@@ -32,5 +32,5 @@ for filename in fileDict.keys():                                 # gia kathe arx
         termWeight_vectors[filename][term] = docWeight       # nested dictionary: filename -> word -> tfidf value 
                                                         
 
-with open("termWeight_vectors2.json", "w") as f: json.dump(termWeight_vectors, f, indent=4)
+with open("tfidfVectors2.json", "w") as f: json.dump(termWeight_vectors, f, indent=4)
 
