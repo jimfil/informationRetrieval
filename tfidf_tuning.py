@@ -30,13 +30,15 @@ def load_relevant(file_path="Relevant.txt"):
     """Φορτώνει τα σχετικά έγγραφα για κάθε ερώτηma."""
     relevant_docs = {}
     with open(file_path, 'r', encoding='utf-8') as file:
+        i = 1
         for line in file:
-            parts = line.strip().split()
-            query_id = int(parts[0])
-            doc_id = parts[1].zfill(5) # Εξασφαλίζει ότι το ID έχει 5 ψηφία (π.χ. '00090')
-            if query_id not in relevant_docs:
-                relevant_docs[query_id] = []
-            relevant_docs[query_id].append(doc_id)
+            query_id = i
+            for part in line.split():
+                doc_id = part.zfill(5) # Εξασφαλίζει ότι το ID έχει 5 ψηφία (π.χ. '00090')
+                if query_id not in relevant_docs:
+                    relevant_docs[query_id] = []
+                relevant_docs[query_id].append(doc_id)
+            i += 1
     return relevant_docs
 
 def evaluate_model(retrieved_ranks, relevant_docs):
@@ -47,13 +49,33 @@ def evaluate_model(retrieved_ranks, relevant_docs):
     num_queries = len(retrieved_ranks)
 
     for query_id, retrieved in retrieved_ranks.items():
+        
         relevant = relevant_docs.get(query_id, [])
         retrieved_ids = [doc_id for doc_id, score in retrieved]
-        
         avg_precision_10 += precision_at_k(retrieved_ids, relevant, 10)
         avg_recall += recall(retrieved_ids, relevant)
         avg_f1 += f1_score(retrieved_ids, relevant)
+    return {
+        "Mean Precision@10": avg_precision_10 / num_queries,
+        "Mean Recall": avg_recall / num_queries,
+        "Mean F1-Score": avg_f1 / num_queries,
+    }
 
+def evaluate_custom_model(retrieved_ranks, relevant_docs):
+    """Αξιολογεί τα custom μοντέλα μας για όλα τα ερωτήματα και επιστρέφει μέσες τιμές."""
+    avg_precision_10 = 0
+    avg_recall = 0
+    avg_f1 = 0
+    num_queries = len(retrieved_ranks)
+
+    for query_id, retrieved in retrieved_ranks.items():
+        
+        relevant = relevant_docs.get(int(query_id), [])
+        retrieved_ids = [item[0] for item in retrieved]
+
+        avg_precision_10 += precision_at_k(retrieved_ids, relevant, 10)
+        avg_recall += recall(retrieved_ids, relevant)
+        avg_f1 += f1_score(retrieved_ids, relevant)
     return {
         "Mean Precision@10": avg_precision_10 / num_queries,
         "Mean Recall": avg_recall / num_queries,
@@ -117,7 +139,6 @@ for i, params in enumerate(param_combinations):
     ranked_docs_sklearn, indexing_time, retrieval_time = run_experiment(docs, queries, params)
     # Αξιολόγηση
     metrics = evaluate_model(ranked_docs_sklearn, relevant_docs)
-    
     results.append({
         'params': params,
         'metrics': metrics,
@@ -140,60 +161,31 @@ print(f"Retrieval Time: {best_model['retrieval_time']:.4f} seconds")
 print("\n--- Comparison with Custom Implementations ---")
 
 # Φόρτωση αποτελεσμάτων από το findDocumentRanks1.py
-try:
-    start_custom_indexing = time.time()
-    os.system('py analyshEurethriou1.py') # Θα μπορούσαμε να τα τρέξουμε έτσι
+for i in range(2): # 2 γυροι για τα 2 ερωτηματα
+    try:
+        start_custom_indexing = time.time()
+        os.system(f'py analyshEurethriou{i+1}.py') 
+        
+        
     
-    
-    # ... αλλά ας υποθέσουμε έναν χρόνο για την ανάλυση
-    custom_indexing_time = time.time() - start_custom_indexing
-    
-    
-    start_custom_retrieval = time.time()
-    os.system('py analyshErwthsewn1.py')
-    os.system('py findDocumentRanks1.py')
-    
-    custom_retrieval_time = time.time() - start_custom_retrieval
-    
-    with open('sortedRelevant.json', 'r') as f:
-        custom_ranks = json.load(f)
-    custom_metrics = evaluate_model(custom_ranks, relevant_docs)
-    
-    print("\nMetrics for Custom TF-IDF Model (Ερώτημα 2):")
-    for metric, value in custom_metrics.items():
-        print(f"  {metric}: {value:.4f}")
-    print(f"Estimated Indexing Time: {custom_indexing_time:.4f} seconds")
-    print(f"Estimated Retrieval Time: {custom_retrieval_time:.4f} seconds")
-
-except :
-    print("\nCould not find 'sortedRelevant.json'. Skipping comparison with custom model.")
-print("\n--- Comparison with Custom Implementations ---")
-
-# Φόρτωση αποτελεσμάτων από το findDocumentRanks1.py
-try:
-    
-    start_custom_indexing = time.time()
-    os.system('py analyshEurethriou2.py') # Θα μπορούσαμε να τα τρέξουμε έτσι
-    
-    custom_indexing_time = time.time() - start_custom_indexing
-
-    
-    start_custom_retrieval = time.time()
-    os.system('py analyshErwthsewn2.py')
-    os.system('py findDocumentRanks2.py')
-
-    custom_retrieval_time = time.time() - start_custom_retrieval
-    with open('sortedRelevant2.json', 'r') as f:
+        custom_indexing_time = time.time() - start_custom_indexing
+        
+        
+        start_custom_retrieval = time.time()
+        os.system(f'py analyshErwthsewn{i+1}.py')
+        os.system(f'py findDocumentRanks{i+1}.py')
+        
+        custom_retrieval_time = time.time() - start_custom_retrieval
+        
+        with open(f'sortedRelevant{i+1}.json', 'r') as f:
             custom_ranks = json.load(f)
+        custom_metrics = evaluate_custom_model(custom_ranks, relevant_docs)
+        
+        print(f"\nMetrics for Custom TF-IDF Model-{i+1} (Ερώτημα 2):")
+        for metric, value in custom_metrics.items():
+            print(f"  {metric}: {value:.4f}")
+        print(f"Estimated Indexing Time: {custom_indexing_time:.4f} seconds")
+        print(f"Estimated Retrieval Time: {custom_retrieval_time:.4f} seconds")
 
-
-    custom_metrics = evaluate_model(custom_ranks, relevant_docs)
-    
-    print("\nMetrics for Custom TF-IDF Model (Ερώτημα 2):")
-    for metric, value in custom_metrics.items():
-        print(f"  {metric}: {value:.4f}")
-    print(f"Estimated Indexing Time: {custom_indexing_time:.4f} seconds")
-    print(f"Estimated Retrieval Time: {custom_retrieval_time:.4f} seconds")
-
-except FileNotFoundError:
-    print("\nCould not find 'sortedRelevant.json'. Skipping comparison with custom model.")
+    except :
+        print("\nError .")

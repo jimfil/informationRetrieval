@@ -32,4 +32,4 @@ for i in range(1,21):
         sortedDocum[i].append(item)
 
 
-with open("sortedRelevant.json", "w") as f: json.dump(sortedDocum, f, indent=4)
+with open("sortedRelevant1.json", "w") as f: json.dump(sortedDocum, f, indent=4)
