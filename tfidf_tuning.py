@@ -114,78 +114,85 @@ def run_experiment(docs, queries, params):
     return all_query_ranks, indexing_time, retrieval_time
 
 
+def find_best_model(docs=None, queries=None, relevant_docs=None):
+    if docs is None: docs = load_docs()
+    if queries is None: queries = load_queries()
+    if relevant_docs is None: relevant_docs = load_relevant()
 
-docs = load_docs()
-queries = load_queries()
-relevant_docs = load_relevant()
+    param_grid = {
+        'ngram_range': [(1, 1), (1, 2)], # plhthos syndiasmwn leksewn 
+        'sublinear_tf': [True, False], # 1 + log(tf) H  tf 
+        'min_df': [1, 2, 5], # h elaxistes fores pou prepei na emfanistei gia na symperilifthei
+        'norm': ['l1', 'l2', None] # eukleidia kanonikopoihsh H manhatan H kamia
+    }
 
+    results = []
 
-param_grid = {
-    'ngram_range': [(1, 1), (1, 2)], # plhthos syndiasmwn leksewn 
-    'sublinear_tf': [True, False], # 1 + log(tf) H  tf 
-    'min_df': [1, 2, 5], # h elaxistes fores pou prepei na emfanistei gia na symperilifthei
-    'norm': ['l1', 'l2', None] # eukleidia kanonikopoihsh H manhatan H kamia
-}
+    print("Running experiments with TfidfVectorizer...")
+    param_combinations = list(ParameterGrid(param_grid))
 
-results = []
+    for i, params in enumerate(param_combinations):
+        print(f"Running combination {i+1}/{len(param_combinations)}: {params}")
+        
+        # Εκτέλεση πειράματος
+        ranked_docs_sklearn, indexing_time, retrieval_time = run_experiment(docs, queries, params)
+        # Αξιολόγηση
+        metrics = evaluate_model(ranked_docs_sklearn, relevant_docs)
+        results.append({
+            'params': params,
+            'metrics': metrics,
+            'indexing_time': indexing_time,
+            'retrieval_time': retrieval_time
+        })
 
-print("Running experiments with TfidfVectorizer...")
-param_combinations = list(ParameterGrid(param_grid))
+    # 4. Εύρεση και Εκτύπωση Καλύτερου Μοντέλου
+    best_model = max(results, key=lambda x: x['metrics']['Mean F1-Score'])
+    return best_model
 
-for i, params in enumerate(param_combinations):
-    print(f"Running combination {i+1}/{len(param_combinations)}: {params}")
+if __name__ == "__main__":
+    docs = load_docs()
+    queries = load_queries()
+    relevant_docs = load_relevant()
     
-    # Εκτέλεση πειράματος
-    ranked_docs_sklearn, indexing_time, retrieval_time = run_experiment(docs, queries, params)
-    # Αξιολόγηση
-    metrics = evaluate_model(ranked_docs_sklearn, relevant_docs)
-    results.append({
-        'params': params,
-        'metrics': metrics,
-        'indexing_time': indexing_time,
-        'retrieval_time': retrieval_time
-    })
+    best_model = find_best_model(docs, queries, relevant_docs)
 
-# 4. Εύρεση και Εκτύπωση Καλύτερου Μοντέλου
-best_model = max(results, key=lambda x: x['metrics']['Mean F1-Score'])
+    print("\n--- Best Model Found ---")
+    print(f"Parameters: {best_model['params']}")
+    print("Metrics:")
+    for metric, value in best_model['metrics'].items():
+        print(f"  {metric}: {value:.4f}")
+    print(f"Indexing Time: {best_model['indexing_time']:.4f} seconds")
+    print(f"Retrieval Time: {best_model['retrieval_time']:.4f} seconds")
 
-print("\n--- Best Model Found ---")
-print(f"Parameters: {best_model['params']}")
-print("Metrics:")
-for metric, value in best_model['metrics'].items():
-    print(f"  {metric}: {value:.4f}")
-print(f"Indexing Time: {best_model['indexing_time']:.4f} seconds")
-print(f"Retrieval Time: {best_model['retrieval_time']:.4f} seconds")
+    # 5. Σύγκριση με τις δικές σας υλοποιήσεις (Ερώτημα 2)
+    print("\n--- Comparison with Custom Implementations ---")
 
-# 5. Σύγκριση με τις δικές σας υλοποιήσεις (Ερώτημα 2)
-print("\n--- Comparison with Custom Implementations ---")
-
-# Φόρτωση αποτελεσμάτων από το findDocumentRanks1.py
-for i in range(2): # 2 γυροι για τα 2 ερωτηματα
-    try:
-        start_custom_indexing = time.time()
-        os.system(f'py analyshEurethriou{i+1}.py') 
+    # Φόρτωση αποτελεσμάτων από το findDocumentRanks1.py
+    for i in range(2): # 2 γυροι για τα 2 ερωτηματα
+        try:
+            start_custom_indexing = time.time()
+            os.system(f'py analyshEurethriou{i+1}.py') 
+            
+            
         
+            custom_indexing_time = time.time() - start_custom_indexing
+            
+            
+            start_custom_retrieval = time.time()
+            os.system(f'py analyshErwthsewn{i+1}.py')
+            os.system(f'py findDocumentRanks{i+1}.py')
+            
+            custom_retrieval_time = time.time() - start_custom_retrieval
+            
+            with open(f'sortedRelevant{i+1}.json', 'r') as f:
+                custom_ranks = json.load(f)
+            custom_metrics = evaluate_custom_model(custom_ranks, relevant_docs)
+            
+            print(f"\nMetrics for Custom TF-IDF Model-{i+1} (Ερώτημα 2):")
+            for metric, value in custom_metrics.items():
+                print(f"  {metric}: {value:.4f}")
+            print(f"Estimated Indexing Time: {custom_indexing_time:.4f} seconds")
+            print(f"Estimated Retrieval Time: {custom_retrieval_time:.4f} seconds")
         
-    
-        custom_indexing_time = time.time() - start_custom_indexing
-        
-        
-        start_custom_retrieval = time.time()
-        os.system(f'py analyshErwthsewn{i+1}.py')
-        os.system(f'py findDocumentRanks{i+1}.py')
-        
-        custom_retrieval_time = time.time() - start_custom_retrieval
-        
-        with open(f'sortedRelevant{i+1}.json', 'r') as f:
-            custom_ranks = json.load(f)
-        custom_metrics = evaluate_custom_model(custom_ranks, relevant_docs)
-        
-        print(f"\nMetrics for Custom TF-IDF Model-{i+1} (Ερώτημα 2):")
-        for metric, value in custom_metrics.items():
-            print(f"  {metric}: {value:.4f}")
-        print(f"Estimated Indexing Time: {custom_indexing_time:.4f} seconds")
-        print(f"Estimated Retrieval Time: {custom_retrieval_time:.4f} seconds")
-
-    except :
-        print("\nError .")
+        except :
+            print("\nError .")
