@@ -5,9 +5,11 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 from sklearn.model_selection import ParameterGrid
-
-# Import από το δικό σας αρχείο με τις μετρικές
 from evaluationMetricsFunctions import precision_at_k, recall, f1_score
+
+def write_line(f, text=""):
+    f.write(text + "\n")
+
 
 def load_docs(folder_path="docs"):
     #Φορτώνει τα έγγραφα από τον καθορισμένο φάκελο.
@@ -153,46 +155,41 @@ if __name__ == "__main__":
     docs = load_docs()
     queries = load_queries()
     relevant_docs = load_relevant()
-    
+
     best_model = find_best_model(docs, queries, relevant_docs)
 
-    print("\n--- Best Model Found ---")
-    print(f"Parameters: {best_model['params']}")
-    print("Metrics:")
-    for metric, value in best_model['metrics'].items():
-        print(f"  {metric}: {value:.4f}")
-    print(f"Indexing Time: {best_model['indexing_time']:.4f} seconds")
-    print(f"Retrieval Time: {best_model['retrieval_time']:.4f} seconds")
+    with open("results.txt", "w", encoding="utf-8") as f:
+        write_line(f, "--- Best Model Found ---")
+        write_line(f, f"Parameters: {best_model['params']}")
+        write_line(f, "Metrics:")
+        for metric, value in best_model['metrics'].items():
+            write_line(f, f"  {metric}: {value:.4f}")
+        write_line(f, f"Indexing Time: {best_model['indexing_time']:.4f} seconds")
+        write_line(f, f"Retrieval Time: {best_model['retrieval_time']:.4f} seconds")
 
-    # 5. Σύγκριση με τις δικές σας υλοποιήσεις (Ερώτημα 2)
-    print("\n--- Comparison with Custom Implementations ---")
+        write_line(f, "\n--- Comparison with Custom Implementations ---")
 
-    # Φόρτωση αποτελεσμάτων από το findDocumentRanks1.py
-    for i in range(2): # 2 γυροι για τα 2 ερωτηματα
-        try:
-            start_custom_indexing = time.time()
-            os.system(f'py analyshEurethriou{i+1}.py') 
-            
-            
-        
-            custom_indexing_time = time.time() - start_custom_indexing
-            
-            
-            start_custom_retrieval = time.time()
-            os.system(f'py analyshErwthsewn{i+1}.py')
-            os.system(f'py findDocumentRanks{i+1}.py')
-            
-            custom_retrieval_time = time.time() - start_custom_retrieval
-            
-            with open(f'sortedRelevant{i+1}.json', 'r') as f:
-                custom_ranks = json.load(f)
-            custom_metrics = evaluate_custom_model(custom_ranks, relevant_docs)
-            
-            print(f"\nMetrics for Custom TF-IDF Model-{i+1} (Ερώτημα 2):")
-            for metric, value in custom_metrics.items():
-                print(f"  {metric}: {value:.4f}")
-            print(f"Estimated Indexing Time: {custom_indexing_time:.4f} seconds")
-            print(f"Estimated Retrieval Time: {custom_retrieval_time:.4f} seconds")
-        
-        except :
-            print("\nError .")
+        for i in range(2):
+            try:
+                start_custom_indexing = time.time()
+                os.system(f'py analyshEurethriou{i+1}.py')
+                custom_indexing_time = time.time() - start_custom_indexing
+
+                start_custom_retrieval = time.time()
+                os.system(f'py analyshErwthsewn{i+1}.py')
+                os.system(f'py findDocumentRanks{i+1}.py')
+                custom_retrieval_time = time.time() - start_custom_retrieval
+
+                with open(f'sortedRelevant{i+1}.json', 'r') as jf:
+                    custom_ranks = json.load(jf)
+
+                custom_metrics = evaluate_custom_model(custom_ranks, relevant_docs)
+
+                write_line(f, f"\nMetrics for Custom TF-IDF Model-{i+1} (Ερώτημα 2):")
+                for metric, value in custom_metrics.items():
+                    write_line(f, f"  {metric}: {value:.4f}")
+                write_line(f, f"Estimated Indexing Time: {custom_indexing_time:.4f} seconds")
+                write_line(f, f"Estimated Retrieval Time: {custom_retrieval_time:.4f} seconds")
+
+            except Exception as e:
+                write_line(f, f"\nError: {e}")
