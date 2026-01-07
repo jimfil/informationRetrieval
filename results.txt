@@ -1,0 +1,24 @@
+--- Best Model Found ---
+Parameters: {'min_df': 1, 'ngram_range': (1, 1), 'norm': 'l1', 'sublinear_tf': True}
+Metrics:
+  Mean Precision@10: 0.4250
+  Mean Recall: 0.9764
+  Mean F1-Score: 0.0617
+Indexing Time: 0.1107 seconds
+Retrieval Time: 0.0910 seconds
+
+--- Comparison with Custom Implementations ---
+
+Metrics for Custom TF-IDF Model-1 (Ερώτημα 2):
+  Mean Precision@10: 0.4150
+  Mean Recall: 0.9764
+  Mean F1-Score: 0.0617
+Estimated Indexing Time: 1.1009 seconds
+Estimated Retrieval Time: 1.1025 seconds
+
+Metrics for Custom TF-IDF Model-2 (Ερώτημα 2):
+  Mean Precision@10: 0.4450
+  Mean Recall: 0.9764
+  Mean F1-Score: 0.0617
+Estimated Indexing Time: 0.7803 seconds
+Estimated Retrieval Time: 1.1003 seconds
