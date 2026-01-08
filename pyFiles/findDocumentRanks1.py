@@ -1,9 +1,9 @@
 import json
 from math import sqrt  #gia ypologismo Cosine Simularity
 
-with open("queryVector2.json", "r") as f:
+with open("textFiles/queryVector.json", "r") as f:
     queryVector = json.load(f)
-with open("tfidfVectors2.json", "r") as f:
+with open("textFiles/tfidfVectors.json", "r") as f:
     tfidf_vectors = json.load(f)
 
 def cosine_similarity(wQuaries, wDocuments):
@@ -32,4 +32,4 @@ for i in range(1,21):
         sortedDocum[i].append(item)
 
 
-with open("sortedRelevant2.json", "w") as f: json.dump(sortedDocum, f, indent=4)
+with open("textFiles/sortedRelevant1.json", "w") as f: json.dump(sortedDocum, f, indent=4)

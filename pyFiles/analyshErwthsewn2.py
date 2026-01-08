@@ -2,14 +2,14 @@ import json
 
 queryVector = {}
 
-with open("inverted_index.json", "r") as f:
+with open("textFiles/inverted_index.json", "r") as f:
     data = json.load(f)
 logValu = {}
 for key in data.keys():
     logValu[key] = data[key].pop()
 
 tf_query ={}
-with open("Queries.txt", "r") as file: 
+with open("textFiles/Queries.txt", "r") as file: 
     i = 1
     for line in file:
         words = line.strip().lower().split()
@@ -28,5 +28,5 @@ for i in tf_query.keys():
         queryVector[i][term]= qw
 
 
-with open("queryVector2.json", "w") as f: json.dump(queryVector, f, indent=4)
+with open("textFiles/queryVector2.json", "w") as f: json.dump(queryVector, f, indent=4)
   

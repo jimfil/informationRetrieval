@@ -3,14 +3,14 @@ import json
 queryVector = {}
 idfWords = {}
 
-with open("inverted_index.json", "r") as f:
+with open("textFiles/inverted_index.json", "r") as f:
     data = json.load(f)
 
 for key in data.keys():
     idfWords[key] = data[key][-1]
 
         
-with open("Queries.txt", "r") as file: 
+with open("textFiles/Queries.txt", "r") as file: 
     i = 1
     for line in file:
         words = line.strip().lower().split()
@@ -28,7 +28,7 @@ with open("Queries.txt", "r") as file:
             queryVector[i][term] = tfidfValue           # nested dictionary: query Number -> word -> tfidf value
         i += 1
                                                 
-with open("queryVector.json", "w") as f: json.dump(queryVector, f, indent=4)
+with open("textFiles/queryVector.json", "w") as f: json.dump(queryVector, f, indent=4)
 
 
 

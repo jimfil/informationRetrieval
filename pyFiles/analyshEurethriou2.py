@@ -3,7 +3,7 @@ from math import sqrt
 
 termWeight_vectors = {}   # filename -> {term: tfidf} , {term2:tfidf}
 
-with open("inverted_index.json", "r") as f:
+with open("textFiles/inverted_index.json", "r") as f:
     data = json.load(f)
 logValu = {}
 fileDict = {}
@@ -32,5 +32,5 @@ for filename in fileDict.keys():                                 # gia kathe arx
         termWeight_vectors[filename][term] = docWeight       # nested dictionary: filename -> word -> tfidf value 
                                                         
 
-with open("tfidfVectors2.json", "w") as f: json.dump(termWeight_vectors, f, indent=4)
+with open("textFiles/tfidfVectors2.json", "w") as f: json.dump(termWeight_vectors, f, indent=4)
 

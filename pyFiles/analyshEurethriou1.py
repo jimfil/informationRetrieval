@@ -2,7 +2,7 @@ import json
 
 tfidf_vectors = {}   # filename -> {term: tfidf} , {term2:tfidf}
 
-with open("inverted_index.json", "r") as f:
+with open("textFiles/inverted_index.json", "r") as f:
     data = json.load(f)
 
 for key in data.keys():
@@ -18,5 +18,5 @@ for key in data.keys():
             tfidf_vectors[filename][key] = tfidf       # nested dictionary: filename -> word -> tfidf value 
                                                         
 
-with open("tfidfVectors.json", "w") as f: json.dump(tfidf_vectors, f, indent=4)
+with open("textFiles/tfidfVectors.json", "w") as f: json.dump(tfidf_vectors, f, indent=4)
 

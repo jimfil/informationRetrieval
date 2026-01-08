@@ -32,4 +32,4 @@ for term in terms:                                                              
     inverted_index[term] = termInDocuments                                                  # Olo auto einai ena dictionary me kleidi thn leksh 
 
 
-with open("inverted_index.json", "w") as f: json.dump(inverted_index, f, indent=4)
+with open("textFiles/inverted_index.json", "w") as f: json.dump(inverted_index, f, indent=4)

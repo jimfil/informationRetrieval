@@ -20,7 +20,7 @@ def load_docs(folder_path="docs"):
             docs[doc_id] = file.read()
     return docs
 
-def load_queries(file_path="Queries.txt"):
+def load_queries(file_path="textFiles/Queries.txt"):
     #Φορτώνει τα ερωτήματα από το αρχείο.
     queries = {}
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -28,7 +28,7 @@ def load_queries(file_path="Queries.txt"):
             queries[i + 1] = line.strip()
     return queries
 
-def load_relevant(file_path="Relevant.txt"):
+def load_relevant(file_path="textFiles/Relevant.txt"):
     """Φορτώνει τα σχετικά έγγραφα για κάθε ερώτηma."""
     relevant_docs = {}
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -158,7 +158,7 @@ if __name__ == "__main__":
 
     best_model = find_best_model(docs, queries, relevant_docs)
 
-    with open("results.txt", "w", encoding="utf-8") as f:
+    with open("textFiles/results.txt", "w", encoding="utf-8") as f:
         write_line(f, "--- Best Model Found ---")
         write_line(f, f"Parameters: {best_model['params']}")
         write_line(f, "Metrics:")
@@ -172,12 +172,12 @@ if __name__ == "__main__":
         for i in range(2):
             try:
                 start_custom_indexing = time.time()
-                os.system(f'py analyshEurethriou{i+1}.py')
+                os.system(f'py pyFiles/analyshEurethriou{i+1}.py')
                 custom_indexing_time = time.time() - start_custom_indexing
 
                 start_custom_retrieval = time.time()
-                os.system(f'py analyshErwthsewn{i+1}.py')
-                os.system(f'py findDocumentRanks{i+1}.py')
+                os.system(f'py pyFiles/analyshErwthsewn{i+1}.py')
+                os.system(f'py pyFiles/findDocumentRanks{i+1}.py')
                 custom_retrieval_time = time.time() - start_custom_retrieval
 
                 with open(f'sortedRelevant{i+1}.json', 'r') as jf:
