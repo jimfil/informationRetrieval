@@ -1,11 +1,14 @@
-import os
 import json
 import time
+import os
+from createEurethrio import createInvertedIndex
+from vectorizer1 import cls_analyshErwthsewn, cls_findDocumentRanks, cls_analyshEurethriou
+from vectorizer2 import analyshErwthsewn, findDocumentRanks, analyshEurethriou
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 from sklearn.model_selection import ParameterGrid
-from evaluationMetricsFunctions import precision_at_k, recall, f1_score
+from evaluationMetricsFunctions import plot_precision_recall_curve, precision_at_k, recall, f1_score
 
 def write_line(f, text=""):
     f.write(text + "\n")
@@ -57,6 +60,7 @@ def evaluate_model(retrieved_ranks, relevant_docs):
         avg_precision_10 += precision_at_k(retrieved_ids, relevant, 10)
         avg_recall += recall(retrieved_ids, relevant)
         avg_f1 += f1_score(retrieved_ids, relevant)
+        #plot_precision_recall_curve(retrieved_ids, relevant)
     return {
         "Mean Precision@10": avg_precision_10 / num_queries,
         "Mean Recall": avg_recall / num_queries,
@@ -124,7 +128,8 @@ def find_best_model(docs=None, queries=None, relevant_docs=None):
     param_grid = {
         'ngram_range': [(1, 1), (1, 2)], # plhthos syndiasmwn leksewn 
         'sublinear_tf': [True, False], # 1 + log(tf) H  tf 
-        'min_df': [1, 2, 5], # h elaxistes fores pou prepei na emfanistei gia na symperilifthei
+        'min_df': [1, 2], # h elaxistes fores pou prepei na emfanistei gia na symperilifthei
+        'max_df': [0.8, 1.0], # to megisto pososto twn docs pou mporei na emfanistei h leksi
         'norm': ['l1', 'l2', None] # eukleidia kanonikopoihsh H manhatan H kamia
     }
 
@@ -148,7 +153,8 @@ def find_best_model(docs=None, queries=None, relevant_docs=None):
         })
 
     # 4. Εύρεση και Εκτύπωση Καλύτερου Μοντέλου
-    best_model = max(results, key=lambda x: x['metrics']['Mean F1-Score'])
+    best_model = max(results, key=lambda x: x['metrics']['Mean Precision@10'])
+    with open("textFiles/bestModel.json", "w") as f: json.dump(best_model, f, indent=4)
     return best_model
 
 if __name__ == "__main__":
@@ -169,27 +175,59 @@ if __name__ == "__main__":
 
         write_line(f, "\n--- Comparison with Custom Implementations ---")
 
-        for i in range(2):
-            try:
-                start_custom_indexing = time.time()
-                os.system(f'py pyFiles/analyshEurethriou{i+1}.py')
-                custom_indexing_time = time.time() - start_custom_indexing
+        #1st model
+        try:
+            start_Indexing = time.time()
+            createInvertedIndex()
+            time1 = time.time() - start_Indexing
 
-                start_custom_retrieval = time.time()
-                os.system(f'py pyFiles/analyshErwthsewn{i+1}.py')
-                os.system(f'py pyFiles/findDocumentRanks{i+1}.py')
-                custom_retrieval_time = time.time() - start_custom_retrieval
+            start_custom_indexing = time.time()
+            cls_analyshEurethriou()
+            custom_indexing_time = time.time() - start_custom_indexing + time1
 
-                with open(f'sortedRelevant{i+1}.json', 'r') as jf:
-                    custom_ranks = json.load(jf)
+            start_custom_retrieval = time.time()
+            
+            cls_analyshErwthsewn()
+            cls_findDocumentRanks()
+            custom_retrieval_time = time.time() - start_custom_retrieval
 
-                custom_metrics = evaluate_custom_model(custom_ranks, relevant_docs)
+            with open(f'textFiles/sortedRelevant{1}.json', 'r') as jf:
+                custom_ranks = json.load(jf)
 
-                write_line(f, f"\nMetrics for Custom TF-IDF Model-{i+1} (Ερώτημα 2):")
-                for metric, value in custom_metrics.items():
-                    write_line(f, f"  {metric}: {value:.4f}")
-                write_line(f, f"Estimated Indexing Time: {custom_indexing_time:.4f} seconds")
-                write_line(f, f"Estimated Retrieval Time: {custom_retrieval_time:.4f} seconds")
+            custom_metrics = evaluate_custom_model(custom_ranks, relevant_docs)
 
-            except Exception as e:
-                write_line(f, f"\nError: {e}")
+            write_line(f, f"\nMetrics for Classic Tf-idf Model:")
+            for metric, value in custom_metrics.items():
+                write_line(f, f"  {metric}: {value:.4f}")
+            write_line(f, f"Estimated Indexing Time: {custom_indexing_time:.4f} seconds")
+            write_line(f, f"Estimated Retrieval Time: {custom_retrieval_time:.4f} seconds")
+
+        except Exception as e:
+            write_line(f, f"\nError: {e}")
+
+
+        #2nd model
+        try:
+
+            start_custom_indexing2 = time.time()
+            analyshEurethriou()
+            custom_indexing_time = time.time() - start_custom_indexing2 + time1
+
+            start_custom_retrieval = time.time()
+            analyshErwthsewn()
+            findDocumentRanks()
+            custom_retrieval_time = time.time() - start_custom_retrieval
+
+            with open(f'textFiles/sortedRelevant{2}.json', 'r') as jf:
+                custom_ranks = json.load(jf)
+
+            custom_metrics = evaluate_custom_model(custom_ranks, relevant_docs)
+
+            write_line(f, f"\nMetrics for Best fully weighted system tfc-nfx Model:")
+            for metric, value in custom_metrics.items():
+                write_line(f, f"  {metric}: {value:.4f}")
+            write_line(f, f"Estimated Indexing Time: {custom_indexing_time:.4f} seconds")
+            write_line(f, f"Estimated Retrieval Time: {custom_retrieval_time:.4f} seconds")
+
+        except Exception as e:
+            write_line(f, f"\nError: {e}")

@@ -1,4 +1,5 @@
-from tfidf_tuning import load_docs, find_best_model
+import json
+from tfidf_tuning import load_docs
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import ParameterGrid
 from sklearn.cluster import KMeans
@@ -9,8 +10,8 @@ import matplotlib.pyplot as plt
 
 docs = load_docs()
 documents = list(docs.values())
-best_model = find_best_model(docs)
-
+with open("textFiles/bestModel.json", "r") as f: best_model = json.load(f)
+best_model["params"]["ngram_range"] = tuple(best_model["params"]["ngram_range"])
 
 
 vectorizer = TfidfVectorizer(**best_model['params'])
@@ -26,12 +27,11 @@ for k in K_range:
 
 K = K_range[sil_scores.index(max(sil_scores))]
 
-
-
 kmeans = KMeans(n_clusters=K, random_state=42, n_init=10)
 labels_tfidf = kmeans.fit_predict(X_tfidf)
 
 sil_tfidf = silhouette_score(X_tfidf, labels_tfidf)   
+
 
 
 model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
@@ -47,8 +47,9 @@ X_emb_pca   = PCA(n_components=2).fit_transform(X_emb)
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
 
 ax1.scatter(X_tfidf_pca[:,0], X_tfidf_pca[:,1], c=labels_tfidf)
-ax1.set_title("TF–IDF Clustering (PCA)")
+ax1.set_title(f"TF–IDF Clustering (Silhouette: {sil_tfidf:.3f})")
+
 
 ax2.scatter(X_emb_pca[:,0], X_emb_pca[:,1], c=labels_emb)
-ax2.set_title("Embeddings Clustering (PCA)")
+ax2.set_title(f"Embeddings Clustering (Silhouette: {sil_emb:.3f})")
 plt.show()

@@ -1,5 +1,5 @@
 import json
-from math import sqrt 
+from math import sqrt,log 
 
 
 def analyshErwthsewn():
@@ -9,7 +9,7 @@ def analyshErwthsewn():
         data = json.load(f)
     logValu = {}
     for key in data.keys():
-        logValu[key] = data[key].pop()
+        logValu[key] = log(data[key].pop(),10)
 
     tf_query ={}
     with open("textFiles/Queries.txt", "r") as file: 
@@ -24,34 +24,49 @@ def analyshErwthsewn():
             i += 1
 
     for i in tf_query.keys():
+        if i == 0: continue
         max_tf = max(tf_query[i].values())
         for term in tf_query[i].keys(): 
             qw = (0.5 + 0.5 * tf_query[i][term] / max_tf) * logValu.get(term, 0.0)
             if i not in queryVector: queryVector[i] = {}
             queryVector[i][term]= qw
 
-    
     with open("textFiles/queryVector2.json", "w") as f: json.dump(queryVector, f, indent=4)
 
 def analyshEurethriou():
-    tfidf_vectors = {}
+    termWeight_vectors = {}   # filename -> {term: wd} , {term2:wd} opou wd = tf*log / sqrt((tfi*logN/ni)^2)
 
     with open("textFiles/inverted_index.json", "r") as f:
         data = json.load(f)
+    logValu = {}
+    fileDict = {}
 
-    for key in data.keys():
-        logValue = data[key].pop()
+    for key in data.keys():                                     # gia kathe leksi
+        logValu[key] = data[key].pop()                          # item = [],[],[],logN/n
+        for item in data[key]:                  # item = ["30001":0.005],[],[],logN/n (pare kathe arxeio pou yparxei h leksh auth)
+            mult = (item[1]* logValu[key])                      # ypologise to tf * logN/n
+            if item[0] not in fileDict:                         # an den yparxei dict gia auto to arxeio dhmiourghse to 
+                fileDict[item[0]] = {}              
+            fileDict[item[0]][key] = mult
 
-        for item in data[key]:
-            filename = item[0]
-            tfValue = item[1]
-            tfidf = (0.5 + 0.5 * tfValue / max([item[1] for item in data[key]])) * logValue
+                                                                # pleon exoume kathe arxeio me oti TERM exei
 
-            if filename not in tfidf_vectors:
-                tfidf_vectors[filename] = {}
-            tfidf_vectors[filename][key] = tfidf
+    for filename in fileDict.keys():                                 # gia kathe arxeio
+        temp = 0  
+        for term2 in fileDict[filename].keys():
+            temp += (fileDict[filename][term2])* (fileDict[filename][term2])
+        denom = sqrt(temp)
+        for term in fileDict[filename].keys():                       # gia kathe leksi
+            num = fileDict[filename][term] 
+            docWeight = num / denom          
+            
+            if filename not in termWeight_vectors:           # an den yparxei dict gia auto to arxeio dhmiourghse to 
+                termWeight_vectors[filename] = {}
+            termWeight_vectors[filename][term] = docWeight       # nested dictionary: filename -> word -> tfidf value 
+                                                            
 
-    with open("textFiles/tfidfVectors2.json", "w") as f: json.dump(tfidf_vectors, f, indent=4)
+    with open("textFiles/tfidfVectors2.json", "w") as f: json.dump(termWeight_vectors, f, indent=4)
+
 
 def findDocumentRanks():
     with open("textFiles/queryVector2.json", "r") as f:
@@ -62,23 +77,19 @@ def findDocumentRanks():
     denom_values_query = {}
     denom_values_doc = {}
 
-    def calculate_denom_values():                   # optimization gia na min ypologizontai kathe fora 
-        '''
-        Calculate and store the denominator values for all documents and queries.
-        '''
-        for filename in tfidf_vectors.keys():               # Riza( Σ wd^2)
-            denom_values_doc[filename] = 0
-            for v in tfidf_vectors[filename].values():
-                denom_values_doc[filename] += v * v
-            denom_values_doc[filename] = sqrt(denom_values_doc[filename])
+    
+    for filename in tfidf_vectors.keys():               # Riza( Σ wd^2)
+        denom_values_doc[filename] = 0
+        for v in tfidf_vectors[filename].values():
+            denom_values_doc[filename] += v * v
+        denom_values_doc[filename] = sqrt(denom_values_doc[filename])
 
-        for qname in queryVector.keys():                    # Riza(Σ wq^2)
-            denom_values_query[qname] = 0
-            for v in queryVector[qname].values():
-                denom_values_query[qname] += v * v
-            denom_values_query[qname] = sqrt(denom_values_query[qname])
+    for qname in queryVector.keys():                    # Riza(Σ wq^2)
+        denom_values_query[qname] = 0
+        for v in queryVector[qname].values():
+            denom_values_query[qname] += v * v
+        denom_values_query[qname] = sqrt(denom_values_query[qname])
 
-    calculate_denom_values()
 
     def cosine_similarity(wQuaries, wDocuments,queryName, docName):
         '''Calculate cosine similarity between query and document vectors.'''
@@ -124,8 +135,8 @@ def printRelevancy():
         print(f"{i+1}. Document number: {sortedRelevant[str(name)][i]}")
 
 if __name__ == "__main__":
-    input("Press Enter to start TF-IDF Tuning Process  or q to quit: ")
-    if 'q' in input().lower():
+    yes = input("Press Enter to start TF-IDF Tuning Process  or q to quit: ")
+    if 'q' in yes.lower():
         exit()
     print("Creating TF-IDF Vectors for Documents and Queries")
     analyshEurethriou()

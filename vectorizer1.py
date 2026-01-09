@@ -1,5 +1,5 @@
 import json
-from math import sqrt  #gia ypologismo Cosine Simularity
+from math import sqrt,log  #gia ypologismo Cosine Simularity
 
 def cls_analyshEurethriou():
     tfidf_vectors = {}   # filename -> {term: tfidf} , {term2:tfidf}
@@ -8,9 +8,9 @@ def cls_analyshEurethriou():
         data = json.load(f)
 
     for key in data.keys():
-            idfValue = data[key][-1]
+            idfValue = log(data[key].pop(),10)
 
-            for item in data[key][:-1]:
+            for item in data[key]:
                 filename = item[0]
                 tfValue = item[1]                           
                 tfidf = tfValue * idfValue                    
@@ -19,7 +19,6 @@ def cls_analyshEurethriou():
                     tfidf_vectors[filename] = {}
                 tfidf_vectors[filename][key] = tfidf       # nested dictionary: filename -> word -> tfidf value 
                                                             
-
     with open("textFiles/tfidfVectors.json", "w") as f: json.dump(tfidf_vectors, f, indent=4)
 
 def cls_analyshErwthsewn():
@@ -30,7 +29,7 @@ def cls_analyshErwthsewn():
         data = json.load(f)
 
         for key in data.keys():
-            idfWords[key] = data[key][-1]
+            idfWords[key] = log(data[key].pop(),10)
 
                 
         with open("textFiles/Queries.txt", "r") as file: 
@@ -42,17 +41,13 @@ def cls_analyshErwthsewn():
                     tf_query[term] = tf_query.get(term, 0) + 1
                 for term in tf_query.keys():
                     tf_query[term] /= len(words)
-                    max_tf = max(tf_query.values())
-                    if term in idfWords: idftemp =idfWords[term]# an DEN yparxei auth h leksh sto leksiko mas den tha thn psaksoume ara idfvalue=0 
-                    else:  idftemp = 0 
-                    tfidfValue = (0.5 + 0.5 * tf_query[term] / max_tf) * idftemp       # ypologismos tfidfvalues
+                    tfidfValue = (tf_query[term]) * idfWords.get(term, 0.0)      # ypologismos tfidfvalues
                     if i not in queryVector:                    # an den yparxei dict gia auto to arxeio dhmiourghse to 
                         queryVector[i] = {}
                     queryVector[i][term] = tfidfValue           # nested dictionary: query Number -> word -> tfidf value
                 i += 1
                                                         
     with open("textFiles/queryVector.json", "w") as f: json.dump(queryVector, f, indent=4)
-
 
 def cls_findDocumentRanks():
     with open("textFiles/queryVector.json", "r") as f:
@@ -63,23 +58,18 @@ def cls_findDocumentRanks():
     denom_values_query = {}
     denom_values_doc = {}
 
-    def calculate_denom_values():                   # optimization gia na min ypologizontai kathe fora 
-        '''
-        Calculate and store the denominator values for all documents and queries.
-        '''
-        for filename in tfidf_vectors.keys():               # Riza( Σ wd^2)
-            denom_values_doc[filename] = 0
-            for v in tfidf_vectors[filename].values():
-                denom_values_doc[filename] += v * v
-            denom_values_doc[filename] = sqrt(denom_values_doc[filename])
+    for filename in tfidf_vectors.keys():               # Riza( Σ wd^2)
+        denom_values_doc[filename] = 0
+        for v in tfidf_vectors[filename].values():
+            denom_values_doc[filename] += v * v
+        denom_values_doc[filename] = sqrt(denom_values_doc[filename])
 
-        for qname in queryVector.keys():                    # Riza(Σ wq^2)
-            denom_values_query[qname] = 0
-            for v in queryVector[qname].values():
-                denom_values_query[qname] += v * v
-            denom_values_query[qname] = sqrt(denom_values_query[qname])
+    for qname in queryVector.keys():                    # Riza(Σ wq^2)
+        denom_values_query[qname] = 0
+        for v in queryVector[qname].values():
+            denom_values_query[qname] += v * v
+        denom_values_query[qname] = sqrt(denom_values_query[qname])
 
-    calculate_denom_values()
 
     def cosine_similarity(wQuaries, wDocuments,queryName, docName):
         '''Calculate cosine similarity between query and document vectors.'''

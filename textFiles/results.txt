@@ -1,24 +1,24 @@
 --- Best Model Found ---
-Parameters: {'min_df': 1, 'ngram_range': (1, 1), 'norm': 'l1', 'sublinear_tf': True}
+Parameters: {'max_df': 0.8, 'min_df': 1, 'ngram_range': (1, 1), 'norm': 'l1', 'sublinear_tf': True}
 Metrics:
   Mean Precision@10: 0.4250
   Mean Recall: 0.9764
   Mean F1-Score: 0.0617
-Indexing Time: 0.1107 seconds
-Retrieval Time: 0.0910 seconds
+Indexing Time: 0.1138 seconds
+Retrieval Time: 0.0874 seconds
 
 --- Comparison with Custom Implementations ---
 
-Metrics for Custom TF-IDF Model-1 (Ερώτημα 2):
-  Mean Precision@10: 0.4150
-  Mean Recall: 0.9764
-  Mean F1-Score: 0.0617
-Estimated Indexing Time: 1.1009 seconds
-Estimated Retrieval Time: 1.1025 seconds
-
-Metrics for Custom TF-IDF Model-2 (Ερώτημα 2):
+Metrics for Classic Tf-idf Model:
   Mean Precision@10: 0.4450
   Mean Recall: 0.9764
   Mean F1-Score: 0.0617
-Estimated Indexing Time: 0.7803 seconds
-Estimated Retrieval Time: 1.1003 seconds
+Estimated Indexing Time: 37.7438 seconds
+Estimated Retrieval Time: 0.4829 seconds
+
+Metrics for Best fully weighted system tfc-nfx Model:
+  Mean Precision@10: 0.3950
+  Mean Recall: 0.9764
+  Mean F1-Score: 0.0617
+Estimated Indexing Time: 37.7631 seconds
+Estimated Retrieval Time: 0.5788 seconds

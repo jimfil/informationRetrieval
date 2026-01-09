@@ -63,6 +63,24 @@ def precision_at_k(retrieved_docs, relevant_docs, k):
     top_k_docs = retrieved_docs[:k]
     return precision(top_k_docs, relevant_docs)
 
+def recall_at_k(retrieved_docs, relevant_docs, k):
+    """
+    Υπολογίζει την Ανάκληση@k (Recall@k).
+    Recall@k = (Αριθμός σχετικών εγγράφων στα πρώτα k) / (Συνολικός αριθμός σχετικών εγγράφων)  
+
+    :param retrieved_docs: Ταξινομημένη λίστα με τα IDs των ανακτημένων εγγράφων.
+    :param relevant_docs: Λίστα με τα IDs των σχετικών εγγράφων.
+    :param k: Ο αριθμός των κορυφαίων εγγράφων που θα εξεταστούν.
+    :return: Η τιμή της ακρίβειας@k (float).
+    """
+    if k == 0:
+        return 0.0
+    
+    top_k_docs = retrieved_docs[:k]
+    return recall(top_k_docs, relevant_docs)
+
+
+
 def plot_precision_recall_curve(retrieved_docs, relevant_docs):
     """
     Υπολογίζει τα σημεία και σχεδιάζει το διάγραμμα Ανάκλησης-Ακρίβειας.
