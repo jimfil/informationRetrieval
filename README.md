@@ -7,9 +7,10 @@ Installation and execution instructions for the Information Retrieval assignment
 * **git**: Required to clone the repository.
 
 ## 2. Clone the repository
+```bash
 git clone https://github.com/jimfil/informationRetrieval/
 cd informationRetrieval
-
+```
 ## 3. Library Installation
 Open a terminal and run the following command to install all necessary libraries:
 
