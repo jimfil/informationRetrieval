@@ -1,13 +1,9 @@
 import matplotlib.pyplot as plt
 
-def precision(retrieved_docs, relevant_docs):  # false positives (eggrafa pou anakththikan kai einai lathos)
+def precision(retrieved_docs, relevant_docs): 
     """
     Υπολογίζει την Ακρίβεια (Precision).
     Precision = (Αριθμός σχετικών εγγράφων που ανακτήθηκαν) / (Συνολικός αριθμός εγγράφων που ανακτήθηκαν)
-
-    :param retrieved_docs: Λίστα με τα IDs των ανακτημένων εγγράφων.
-    :param relevant_docs: Λίστα με τα IDs των σχετικών εγγράφων.
-    :return: Η τιμή της ακρίβειας (float).
     """
     retrieved_set = set(retrieved_docs)
     relevant_set = set(relevant_docs)
@@ -19,14 +15,10 @@ def precision(retrieved_docs, relevant_docs):  # false positives (eggrafa pou an
         
     return true_positives / len(retrieved_docs)
 
-def recall(retrieved_docs, relevant_docs): # false negatives (eggrafa pou DEN anakththikan kai einai SWSTA)
+def recall(retrieved_docs, relevant_docs): 
     """
     Υπολογίζει την Ανάκληση (Recall).
     Recall = (Αριθμός σχετικών εγγράφων που ανακτήθηκαν) / (Συνολικός αριθμός σχετικών εγγράφων)
-
-    :param retrieved_docs: Λίστα με τα IDs των ανακτημένων εγγράφων.
-    :param relevant_docs: Λίστα με τα IDs των σχετικών εγγράφων.
-    :return: Η τιμή της ανάκλησης (float).
     """
     retrieved_set = set(retrieved_docs)
     relevant_set = set(relevant_docs)
@@ -51,11 +43,6 @@ def precision_at_k(retrieved_docs, relevant_docs, k):
     """
     Υπολογίζει την Ακρίβεια@k (Precision@k).
     Precision@k = (Αριθμός σχετικών εγγράφων στα πρώτα k) / k
-
-    :param retrieved_docs: Ταξινομημένη λίστα με τα IDs των ανακτημένων εγγράφων.
-    :param relevant_docs: Λίστα με τα IDs των σχετικών εγγράφων.
-    :param k: Ο αριθμός των κορυφαίων εγγράφων που θα εξεταστούν.
-    :return: Η τιμή της ακρίβειας@k (float).
     """
     if k == 0:
         return 0.0
@@ -67,11 +54,6 @@ def recall_at_k(retrieved_docs, relevant_docs, k): # not used in this project !!
     """
     Υπολογίζει την Ανάκληση@k (Recall@k).
     Recall@k = (Αριθμός σχετικών εγγράφων στα πρώτα k) / (Συνολικός αριθμός σχετικών εγγράφων)  
-
-    :param retrieved_docs: Ταξινομημένη λίστα με τα IDs των ανακτημένων εγγράφων.
-    :param relevant_docs: Λίστα με τα IDs των σχετικών εγγράφων.
-    :param k: Ο αριθμός των κορυφαίων εγγράφων που θα εξεταστούν.
-    :return: Η τιμή της ακρίβειας@k (float).
     """
     if k == 0:
         return 0.0

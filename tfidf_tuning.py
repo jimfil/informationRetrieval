@@ -15,7 +15,6 @@ def write_line(f, text=""):
 
 
 def load_docs(folder_path="docs"):
-    #Φορτώνει τα έγγραφα από τον καθορισμένο φάκελο.
     docs = {}
     for filename in sorted(os.listdir(folder_path)):
         doc_id = filename
@@ -24,7 +23,6 @@ def load_docs(folder_path="docs"):
     return docs
 
 def load_queries(file_path="textFiles/Queries.txt"):
-    #Φορτώνει τα ερωτήματα από το αρχείο.
     queries = {}
     with open(file_path, 'r', encoding='utf-8') as file:
         for i, line in enumerate(file):
@@ -39,7 +37,7 @@ def load_relevant(file_path="textFiles/Relevant.txt"):
         for line in file:
             query_id = i
             for part in line.split():
-                doc_id = part.zfill(5) # Εξασφαλίζει ότι το ID έχει 5 ψηφία (π.χ. '00090')
+                doc_id = part.zfill(5) # το ID έχει 5 ψηφία (00792)
                 if query_id not in relevant_docs:
                     relevant_docs[query_id] = []
                 relevant_docs[query_id].append(doc_id)
@@ -103,7 +101,7 @@ def run_experiment(docs, queries, params):
     end_time_indexing = time.time()
     indexing_time = end_time_indexing - start_time_indexing
 
-    # --- Ανάκτηση (Retrieval) ---
+    # Ανάκτηση
     all_query_ranks = {}
     start_time_retrieval = time.time()
     for query_id, query_text in queries.items(): # query_text -> string oxi lista !!!
@@ -143,7 +141,6 @@ def find_best_model(docs=None, queries=None, relevant_docs=None):
         
         # Εκτέλεση πειράματος
         ranked_docs_sklearn, indexing_time, retrieval_time = run_experiment(docs, queries, params)
-        # Αξιολόγηση
         metrics = evaluate_model(ranked_docs_sklearn, relevant_docs)
         results.append({
             'params': params,
@@ -152,7 +149,6 @@ def find_best_model(docs=None, queries=None, relevant_docs=None):
             'retrieval_time': retrieval_time
         })
 
-    # 4. Εύρεση και Εκτύπωση Καλύτερου Μοντέλου
     best_model = max(results, key=lambda x: x['metrics']['Mean Precision@10'])
     with open("textFiles/bestModel.json", "w") as f: json.dump(best_model, f, indent=4)
     return best_model
@@ -166,7 +162,6 @@ if __name__ == "__main__":
 
     best_model = find_best_model(docs, queries, relevant_docs)
     """
-    # Plotting Precision-Recall curves
     print("\n--- Plotting Precision-Recall Curves ---")
     while True:
         try:
@@ -177,9 +172,7 @@ if __name__ == "__main__":
         except ValueError:
             print("Invalid input. Please enter a number.")
 
-    # Best Sklearn Model
     print(f"Plotting for Best Sklearn Model - Query {target_q_id}")
-    # Run experiment only for the selected query to save time/resources
     best_ranks, _, _ = run_experiment(docs, {target_q_id: queries[target_q_id]}, best_model['params'])
     if target_q_id in best_ranks:
         ranks = best_ranks[target_q_id]
@@ -187,7 +180,6 @@ if __name__ == "__main__":
         retrieved_ids = [doc_id for doc_id, score in ranks]
         plot_precision_recall_curve(retrieved_ids, relevant, title=f"Best Sklearn Model - Query {target_q_id}")
 
-    # Custom Model 1
     print(f"Plotting for Custom Model Classic tf-idf - Query {target_q_id}")
     with open("textFiles/sortedRelevant1.json", "r") as f:
         custom_ranks1 = json.load(f)
@@ -197,7 +189,6 @@ if __name__ == "__main__":
         retrieved_ids = [item[0] for item in ranks]
         plot_precision_recall_curve(retrieved_ids, relevant, title=f"Custom Model Classic tf-idf - Query {target_q_id}")
 
-    # Custom Model 2
     print(f"Plotting for Custom Model tfc-nfx - Query {target_q_id}")
     with open("textFiles/sortedRelevant2.json", "r") as f:
         custom_ranks2 = json.load(f)
