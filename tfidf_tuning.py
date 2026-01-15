@@ -125,7 +125,7 @@ def find_best_model(docs=None, queries=None, relevant_docs=None):
     if queries is None: queries = load_queries()
     if relevant_docs is None: relevant_docs = load_relevant()
 
-    param_grid = {
+    param_grid = { #2*2*2*2*3 = 48 sunduasmoi
         'ngram_range': [(1, 1), (1, 2)], # plhthos syndiasmwn leksewn 
         'sublinear_tf': [True, False], # 1 + log(tf) H  tf 
         'min_df': [1, 2], # h elaxistes fores pou prepei na emfanistei gia na symperilifthei
@@ -157,13 +157,58 @@ def find_best_model(docs=None, queries=None, relevant_docs=None):
     with open("textFiles/bestModel.json", "w") as f: json.dump(best_model, f, indent=4)
     return best_model
 
+
+
 if __name__ == "__main__":
     docs = load_docs()
     queries = load_queries()
     relevant_docs = load_relevant()
 
     best_model = find_best_model(docs, queries, relevant_docs)
+    
+    # Plotting Precision-Recall curves
+    print("\n--- Plotting Precision-Recall Curves ---")
+    while True:
+        try:
+            target_q_id = int(input("Enter Query ID to plot (1-20): "))
+            if target_q_id in queries:
+                break
+            print("Query ID not found. Please try again.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
 
+    # Best Sklearn Model
+    print(f"Plotting for Best Sklearn Model - Query {target_q_id}")
+    # Run experiment only for the selected query to save time/resources
+    best_ranks, _, _ = run_experiment(docs, {target_q_id: queries[target_q_id]}, best_model['params'])
+    if target_q_id in best_ranks:
+        ranks = best_ranks[target_q_id]
+        relevant = relevant_docs.get(target_q_id, [])
+        retrieved_ids = [doc_id for doc_id, score in ranks]
+        plot_precision_recall_curve(retrieved_ids, relevant, title=f"Best Sklearn Model - Query {target_q_id}")
+
+    # Custom Model 1
+    print(f"Plotting for Custom Model Classic tf-idf - Query {target_q_id}")
+    with open("textFiles/sortedRelevant1.json", "r") as f:
+        custom_ranks1 = json.load(f)
+    if str(target_q_id) in custom_ranks1:
+        ranks = custom_ranks1[str(target_q_id)]
+        relevant = relevant_docs.get(target_q_id, [])
+        retrieved_ids = [item[0] for item in ranks]
+        plot_precision_recall_curve(retrieved_ids, relevant, title=f"Custom Model Classic tf-idf - Query {target_q_id}")
+
+    # Custom Model 2
+    print(f"Plotting for Custom Model tfc-nfx - Query {target_q_id}")
+    with open("textFiles/sortedRelevant2.json", "r") as f:
+        custom_ranks2 = json.load(f)
+    if str(target_q_id) in custom_ranks2:
+        ranks = custom_ranks2[str(target_q_id)]
+        relevant = relevant_docs.get(target_q_id, [])
+        retrieved_ids = [item[0] for item in ranks]
+        plot_precision_recall_curve(retrieved_ids, relevant, title=f"Custom Model tfc-nfx - Query {target_q_id}")
+    input("Press Enter to continue...")
+    
+    
     with open("textFiles/results.txt", "w", encoding="utf-8") as f:
         write_line(f, "--- Best Model Found ---")
         write_line(f, f"Parameters: {best_model['params']}")
@@ -231,3 +276,5 @@ if __name__ == "__main__":
 
         except Exception as e:
             write_line(f, f"\nError: {e}")
+
+    

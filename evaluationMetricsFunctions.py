@@ -63,7 +63,7 @@ def precision_at_k(retrieved_docs, relevant_docs, k):
     top_k_docs = retrieved_docs[:k]
     return precision(top_k_docs, relevant_docs)
 
-def recall_at_k(retrieved_docs, relevant_docs, k):
+def recall_at_k(retrieved_docs, relevant_docs, k): # not used in this project !!
     """
     Υπολογίζει την Ανάκληση@k (Recall@k).
     Recall@k = (Αριθμός σχετικών εγγράφων στα πρώτα k) / (Συνολικός αριθμός σχετικών εγγράφων)  
@@ -81,7 +81,7 @@ def recall_at_k(retrieved_docs, relevant_docs, k):
 
 
 
-def plot_precision_recall_curve(retrieved_docs, relevant_docs):
+def plot_precision_recall_curve(retrieved_docs, relevant_docs, title=None):
     """
     Υπολογίζει τα σημεία και σχεδιάζει το διάγραμμα Ανάκλησης-Ακρίβειας.
 
@@ -111,7 +111,10 @@ def plot_precision_recall_curve(retrieved_docs, relevant_docs):
     plt.plot(recall_points, precision_points, marker='o', linestyle='-')
     plt.xlabel("Ανάκληση (Recall)")
     plt.ylabel("Ακρίβεια (Precision)")
-    plt.title("Διάγραμμα Ακρίβειας-Ανάκλησης (Precision-Recall Curve)")
+    if title:
+        plt.title(title)
+    else:
+        plt.title("Διάγραμμα Ακρίβειας-Ανάκλησης (Precision-Recall Curve)")
     plt.grid(True)
     plt.xlim([0, 1.05])
     plt.ylim([0, 1.05])
