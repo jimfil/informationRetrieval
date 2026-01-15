@@ -15,7 +15,7 @@ cd informationRetrieval
 Open a terminal and run the following command to install all necessary libraries:
 
 ```bash
-pip install scikit-learn sentence-transformers numpy matplotlib
+pip install -r requirments.txt
 ```
 ## 4. Execution
 Model Comparison: Run the tfidf_tuning.py script to view comparisons between our custom models and the built-in TfidfVectorizer.
