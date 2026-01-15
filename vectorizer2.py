@@ -1,5 +1,5 @@
 import json
-from math import sqrt,log 
+from math import sqrt 
 
 
 def analyshErwthsewn():
@@ -9,7 +9,7 @@ def analyshErwthsewn():
         data = json.load(f)
     logValu = {}
     for key in data.keys():
-        logValu[key] = log(data[key].pop(),10)
+        logValu[key] = data[key].pop()
 
     tf_query ={}
     with open("textFiles/Queries.txt", "r") as file: 

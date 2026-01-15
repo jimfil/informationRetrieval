@@ -4,8 +4,8 @@ Metrics:
   Mean Precision@10: 0.4250
   Mean Recall: 0.9764
   Mean F1-Score: 0.0617
-Indexing Time: 0.1109 seconds
-Retrieval Time: 0.1038 seconds
+Indexing Time: 0.1577 seconds
+Retrieval Time: 0.1119 seconds
 
 --- Comparison with Custom Implementations ---
 
@@ -13,12 +13,12 @@ Metrics for Classic Tf-idf Model:
   Mean Precision@10: 0.4450
   Mean Recall: 0.9764
   Mean F1-Score: 0.0617
-Estimated Indexing Time: 40.9426 seconds
-Estimated Retrieval Time: 0.5358 seconds
+Estimated Indexing Time: 44.3039 seconds
+Estimated Retrieval Time: 0.8170 seconds
 
 Metrics for Best fully weighted system tfc-nfx Model:
-  Mean Precision@10: 0.3950
+  Mean Precision@10: 0.4450
   Mean Recall: 0.9764
   Mean F1-Score: 0.0617
-Estimated Indexing Time: 40.8706 seconds
-Estimated Retrieval Time: 0.5927 seconds
+Estimated Indexing Time: 44.2054 seconds
+Estimated Retrieval Time: 0.5926 seconds

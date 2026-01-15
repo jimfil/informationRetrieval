@@ -165,7 +165,7 @@ if __name__ == "__main__":
     relevant_docs = load_relevant()
 
     best_model = find_best_model(docs, queries, relevant_docs)
-    
+    """
     # Plotting Precision-Recall curves
     print("\n--- Plotting Precision-Recall Curves ---")
     while True:
@@ -207,7 +207,7 @@ if __name__ == "__main__":
         retrieved_ids = [item[0] for item in ranks]
         plot_precision_recall_curve(retrieved_ids, relevant, title=f"Custom Model tfc-nfx - Query {target_q_id}")
     input("Press Enter to continue...")
-    
+    """
     
     with open("textFiles/results.txt", "w", encoding="utf-8") as f:
         write_line(f, "--- Best Model Found ---")

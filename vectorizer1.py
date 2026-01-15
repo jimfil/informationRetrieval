@@ -1,5 +1,5 @@
 import json
-from math import sqrt,log  #gia ypologismo Cosine Simularity
+from math import sqrt #gia ypologismo Cosine Simularity
 
 def cls_analyshEurethriou():
     tfidf_vectors = {}   # filename -> {term: tfidf} , {term2:tfidf}
@@ -8,7 +8,7 @@ def cls_analyshEurethriou():
         data = json.load(f)
 
     for key in data.keys():
-            idfValue = log(data[key].pop(),10)
+            idfValue = data[key].pop(),
 
             for item in data[key]:
                 filename = item[0]
@@ -29,7 +29,7 @@ def cls_analyshErwthsewn():
         data = json.load(f)
 
         for key in data.keys():
-            idfWords[key] = log(data[key].pop(),10)
+            idfWords[key] = data[key].pop()
 
                 
         with open("textFiles/Queries.txt", "r") as file: 
