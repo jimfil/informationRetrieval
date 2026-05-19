@@ -12,8 +12,8 @@ def cls_analyshEurethriou():
 
             for item in data[key]:
                 filename = item[0]
-                tfValue = item[1]                           
-                tfidf = tfValue * idfValue                    
+                tfValue = item[1]          
+                tfidf = tfValue * idfValue[0]                    
 
                 if filename not in tfidf_vectors:           # an den yparxei dict gia auto to arxeio dhmiourghse to 
                     tfidf_vectors[filename] = {}

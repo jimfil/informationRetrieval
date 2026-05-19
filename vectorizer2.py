@@ -43,7 +43,7 @@ def analyshEurethriou():
 
     for key in data.keys():                                     # gia kathe leksi
         logValu[key] = data[key].pop()                          # item = [],[],[],logN/n
-        for item in data[key]:                  # item = ["30001":0.005],[],[],logN/n (pare kathe arxeio pou yparxei h leksh auth)
+        for item in data[key]:                                  # item = ["30001":0.005],[],[],logN/n (pare kathe arxeio pou yparxei h leksh auth)
             mult = (item[1]* logValu[key])                      # ypologise to tf * logN/n
             if item[0] not in fileDict:                         # an den yparxei dict gia auto to arxeio dhmiourghse to 
                 fileDict[item[0]] = {}              
