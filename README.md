@@ -7,6 +7,7 @@ The engine is evaluated on the classic **Cystic Fibrosis (C.F.) dataset**, which
 ---
 
 ## Table of Contents
+- [Project Specifications (Assignment Questions)](#project-specifications-assignment-questions)
 - [Project Architecture](#project-architecture)
 - [File Tree & Descriptions](#file-tree--descriptions)
 - [System Features](#system-features)
@@ -14,6 +15,27 @@ The engine is evaluated on the classic **Cystic Fibrosis (C.F.) dataset**, which
 - [Installation](#installation)
 - [How to Run](#how-to-run)
 - [Evaluation Metrics](#evaluation-metrics)
+
+---
+
+## Project Specifications (Assignment Questions)
+
+The project is structured around the five specific questions outlined in the university assignment:
+
+1. **Question 1 - Collection Parsing & Inverted Index (1 point):** 
+   Parse the provided Cystic Fibrosis dataset to create an inverted index. This involves applying necessary text preprocessing, structuring the index effectively for future retrieval, and handling edge cases like missing document IDs to ensure alignment with relevance lists.
+
+2. **Question 2 - Vector Space Model (VSM) Implementation (3 points):**
+   Develop a custom Vector Space Model (VSM) engine from scratch. Represent both documents and queries as vectors, implementing two different term-weighting schemes: a classic TF-IDF formulation and an alternative normalized scheme. Retrieve and rank the most relevant documents for each query using Cosine Similarity.
+
+3. **Question 3 - Evaluation Metrics (1 point):**
+   Manually implement the core mathematical evaluation metrics for an Information Retrieval system. Specifically, write custom functions to compute Precision, Recall, F1-score, and Precision@k. Additionally, implement a function to generate Precision-Recall Curves.
+
+4. **Question 4 - Hyperparameter Tuning & Comparisons (3 points):**
+   Utilize Scikit-Learn's `TfidfVectorizer` to find the optimal IR model through grid search parameter tuning (testing >30 configurations over parameters like `ngram_range`, `sublinear_tf`, `min_df`, `max_df`, and `norm`). Compare the custom-built models from Question 2 against this optimized library implementation using the metrics from Question 3, and evaluate indexing/retrieval execution times.
+
+5. **Question 5 - Document Clustering & Dimensionality Reduction (2 points):**
+   Perform document clustering to contrast two different representation spaces: sparse TF-IDF vectors (from the optimized model in Q4) and dense semantic embeddings (using Hugging Face's `sentence-transformers`). Determine the optimal number of clusters ($k$) using methods like the Silhouette Score and the Elbow Method, and visualize the final clustered spaces in 2D using Principal Component Analysis (PCA).
 
 ---
 
